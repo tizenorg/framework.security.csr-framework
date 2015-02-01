@@ -245,7 +245,7 @@ static SOCKET XmPHttpSocket(XmPHttpCtx *pCtx)
 
 int XmPHttpInit(XmPHttpCtx *pCtx)
 {
-    pCtx->iPHttpDebug = 1;
+    pCtx->iPHttpDebug = 0;
     pCtx->iPHttpConnTimeo = XmPHttpGetIntEnv(pCtx, XM_SKCONN_TIMEO, SOCK_STD_CONTIMEO);
 
     PHTTP_DBGPRINT(pCtx, ("[phttp] Library initialization succeeded\n"));

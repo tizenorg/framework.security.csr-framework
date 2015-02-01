@@ -35,28 +35,72 @@
 #ifdef __cplusplus 
 extern "C" {
 #endif
+
 /**
- * \file TCSErrorCodes.h
- * \brief TCS Error Code Header File
+ * @file TCSErrorCodes.h
+ * @brief TCS Error Code Header File
  *  
  * This file provides the TCS error code definition.
  */
 
-#define TCS_ERROR_MODULE_GENERIC 1 /* A generic error code. */
+/**
+ * @internal
+ * @addtogroup CAPI_CSRFW_TCS_MODULE
+ * @{
+ */
 
-#define TCS_ERROR_CANCELLED 1 /* Operations cancelled. */
 
-#define TCS_ERROR_DATA_ACCESS 2 /* Unable to access data. */
+/**
+ * @brief A generic error code.
+ * @since_tizen 2.3
+ */
+#define TCS_ERROR_MODULE_GENERIC 1
 
-#define TCS_ERROR_INVALID_PARAM 3 /* Invalid parameter. */
+/**
+ * @brief Operations cancelled.
+ * @since_tizen 2.3
+ */
+#define TCS_ERROR_CANCELLED 1
 
-#define TCS_ERROR_INSUFFICIENT_RES 4 /* Insufficient resource. */
+/**
+ * @brief Unable to access data.
+ * @since_tizen 2.3
+ */
+#define TCS_ERROR_DATA_ACCESS 2
 
-#define TCS_ERROR_INTERNAL 5 /* Unexpected internal error. */
+/**
+ * @brief Invalid parameter.
+ * @since_tizen 2.3
+ */
+#define TCS_ERROR_INVALID_PARAM 3
 
-#define TCS_ERROR_INVALID_HANDLE 6 /* Invalid handle. */
+/**
+ * @brief Insufficient resource.
+ * @since_tizen 2.3
+ */
+#define TCS_ERROR_INSUFFICIENT_RES 4
 
-#define TCS_ERROR_NOT_IMPLEMENTED 7 /* Specified functionality is not implemented in the TCS plug-in. (e.g. repair) */
+/**
+ * @brief Unexpected internal error.
+ * @since_tizen 2.3
+ */
+#define TCS_ERROR_INTERNAL 5
+
+/**
+ * @brief Invalid handle.
+ * @since_tizen 2.3
+ */
+#define TCS_ERROR_INVALID_HANDLE 6
+
+/**
+ * @brief Specified functionality is not implemented in the TCS plug-in. (e.g. repair)
+ * @since_tizen 2.3
+ */
+#define TCS_ERROR_NOT_IMPLEMENTED 7
+
+/**
+ * @}
+ */
 
 #ifdef __cplusplus
 }

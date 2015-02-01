@@ -33,6 +33,7 @@
 #include <unistd.h>
 #include <dlfcn.h>
 #include <malloc.h>
+#include <dlog.h>
 
 #include "TCSImpl.h"
 #include "TCSErrorCodes.h"
@@ -40,14 +41,16 @@
 
 #define TCS_CONSTRUCT_ERRCODE(m, e) (((m) << 24) | (e))
 
-#if defined(DEBUG)
-#define DEBUG_LOG(_fmt_, _param_...)    { \
-                                            printf("[TCS] %s,%d: " _fmt_, __FILE__, __LINE__, ##_param_); \
-                                        }
+#undef LOG_TAG
+#ifndef LOG_TAG
+#define LOG_TAG "CSRFW"
+#endif
+
+#ifdef TIZEN_DEBUG_ENABLE
+#define DEBUG_LOG LOGD
 #else
 #define DEBUG_LOG(_fmt_, _param_...)
 #endif
-
 
 #define PLUGIN_PATH "/opt/usr/share/sec_plugin/libengine.so"
 
@@ -238,7 +241,7 @@ static PluginContext *LoadPlugin(void)
     }
     else
     {
-        DEBUG_LOG("No plugin found.\n");
+        DEBUG_LOG("No plugin found. error=%s\n",dlerror());
     }
 
     return pCtx;

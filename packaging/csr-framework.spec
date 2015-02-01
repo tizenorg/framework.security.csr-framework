@@ -1,7 +1,7 @@
 Summary: A general purpose content screening and reputation solution
 Name: csr-framework
 Version: 1.1.0
-Release: 2
+Release: 11
 
 Source: %{name}-%{version}.tar.gz
 
@@ -11,9 +11,10 @@ URL: http://tizen.org
 
 BuildRequires:  cmake
 BuildRequires:  pkgconfig(dlog)
+BuildRequires:  pkgconfig(glib-2.0)
 
 %description
-csr-framework
+TO BE DESCRIBED
 
 %package devel
 Summary:    Development files for csr-framework
@@ -38,6 +39,10 @@ Comaptilibty test program
 
 
 %build
+export CFLAGS="$CFLAGS -DTIZEN_DEBUG_ENABLE"
+export CXXFLAGS="$CXXFLAGS –DTIZEN_DEBUG_ENABLE"
+export FFLAGS="$FFLAGS -DTIZEN_DEBUG_ENABLE"
+
 cmake . -DCMAKE_INSTALL_PREFIX=%{_prefix}
 
 make %{?jobs:-j%jobs}
@@ -72,6 +77,9 @@ cp -f LICENSE %{buildroot}/usr/share/license/%{name}
 
 %files test
 %defattr(-,root,root,-)
-/usr/sbin/*
-/usr/local/compatibility-test/*
+#/opt/usr/sbin/*
+/opt/usr/local/compatibility-test/*
+#mkdir -p %{buildroot}/opt/usr/compatibility-test
+#mkdir -p %{buildroot}/opt/usr/compatibility-test/db
+#mkdir -p %{buildroot}/opt/usr/compatibility-test/testcontents
 

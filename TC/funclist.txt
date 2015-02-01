@@ -1,0 +1,26 @@
+TCSLIB_HANDLE TCSLibraryOpen(void);
+int TCSLibraryClose(TCSLIB_HANDLE hLib);
+TCSErrorCode TCSGetLastError(TCSLIB_HANDLE hLib);
+int TCSScanData(TCSLIB_HANDLE hLib, TCSScanParam *pParam, TCSScanResult *pResult);
+int TCSScanFile(TCSLIB_HANDLE hLib, char const *pszFileName, int iDataType, int iAction, int iCompressFlag, TCSScanResult *pResult);
+TWPLIB_HANDLE TWPInitLibrary(TWPAPIInit *pApiInit);
+void TWPUninitLibrary(TWPLIB_HANDLE hLib);
+TWP_RESULT TWPConfigurationCreate(TWPLIB_HANDLE hLib, TWPConfiguration *pConfigure, TWPConfigurationHandle *phConfigure);
+TWP_RESULT TWPConfigurationDestroy(TWPLIB_HANDLE hLib, TWPConfigurationHandle *phConfigure);
+TWP_RESULT TWPLookupUrls(TWPLIB_HANDLE hLib, TWPConfigurationHandle hConfigure, TWPRequest *pRequest, int iRedirUrl, const char **ppUrls, unsigned int uCount, TWPResponseHandle *phResponse);
+TWP_RESULT TWPResponseWrite(TWPLIB_HANDLE hLib, TWPResponseHandle hResponse, const void *pData, unsigned uLength);
+TWP_RESULT TWPResponseGetUrlRatingByIndex(TWPLIB_HANDLE hLib, TWPResponseHandle hResponse, unsigned int uIndex,TWPUrlRatingHandle *phRating);
+TWP_RESULT TWPResponseGetUrlRatingByUrl(TWPLIB_HANDLE hLib, TWPResponseHandle hResponse, const char *pUrl,unsigned int uUrlLength, TWPUrlRatingHandle *phRating);
+TWP_RESULT TWPResponseGetRedirUrlFor(TWPLIB_HANDLE hLib, TWPResponseHandle hResponse, TWPUrlRatingHandle hRating,TWPPolicyHandle hPolicy, char **ppUrl, unsigned int *puLength);
+TWP_RESULT TWPResponseGetUrlRatingsCount(TWPLIB_HANDLE hLib, TWPResponseHandle hResponse, unsigned int *puCount);	
+TWP_RESULT TWPResponseDestroy(TWPLIB_HANDLE hLib, TWPResponseHandle *phResponse);
+TWP_RESULT TWPPolicyCreate(TWPLIB_HANDLE hLib, TWPConfigurationHandle hCfg, TWPCategories *pCategories, unsigned int uCount, TWPPolicyHandle *phPolicy);
+TWP_RESULT TWPPolicyValidate(TWPLIB_HANDLE hLib, TWPPolicyHandle hPolicy, TWPUrlRatingHandle hRating, int *piViolated);
+TWP_RESULT TWPPolicyGetViolations(TWPLIB_HANDLE hLib, TWPPolicyHandle hPolicy, TWPUrlRatingHandle hRating,TWPCategories **ppViolated, unsigned *puLength);
+TWP_RESULT TWPPolicyDestroy(TWPLIB_HANDLE hLib, TWPPolicyHandle *phPolicy);
+TWP_RESULT TWPUrlRatingGetScore(TWPLIB_HANDLE hLib, TWPUrlRatingHandle hRating, int *piScore);
+TWP_RESULT TWPUrlRatingGetUrl(TWPLIB_HANDLE hLib, TWPUrlRatingHandle hRating, char **ppUrl,unsigned int *puLength);
+TWP_RESULT TWPUrlRatingGetDLAUrl(TWPLIB_HANDLE hLib, TWPUrlRatingHandle hRating, char **ppDlaUrl, unsigned int *puLength);
+TWP_RESULT TWPUrlRatingHasCategory(TWPLIB_HANDLE hLib, TWPUrlRatingHandle hRating, TWPCategories Category, int *piPresent);
+TWP_RESULT TWPUrlRatingGetCategories(TWPLIB_HANDLE hLib, TWPUrlRatingHandle hRating, TWPCategories **ppCategories,unsigned int *puLength);
+

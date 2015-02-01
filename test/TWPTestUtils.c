@@ -59,6 +59,7 @@
 static void ReportTestCase(TestCase *pCtx);
 static void CallSys(const char *pszCmd);
 static void PutTestRoot(char *pszRoot);
+static char *GetContentPath(void);
 static char *GetTestRoot(void);
 static char *GetBackupDir(void);
 static void PutBackupDir(char *pszBackupDir);
@@ -96,7 +97,6 @@ static void ReportTestCase(TestCase *pCtx)
  */
 void TestCaseCtor(TestCase *pCtx, const char *pszAPI)
 {
-
     strncpy(pCtx->szAPIName, pszAPI, sizeof(pCtx->szAPIName) - 1);
 }
 
@@ -264,6 +264,7 @@ static int CbHttpRead(void *pPrivate, void *pData, int iSize)
     // LOG_OUT("[http] send data\n");
 
     memcpy(pData, pCtx->pData + pCtx->uRead, uToRead);
+    pCtx->uRead += uToRead;
 
     return (int) uToRead;
 }
@@ -297,6 +298,7 @@ static TWP_RESULT HttpSend(TRequest *pCtx, const void *pData, unsigned int uLeng
 
     pCtx->pData = (char *) pData;
     pCtx->uLength = uLength;
+    pCtx->uRead = 0;
 
     iRet = XmHttpExec(pCtx->hHttp, "POST", pCtx->pszUrl, &HttpCb, pCtx);
 
@@ -344,28 +346,38 @@ static void CallSys(const char *pszCmd)
 }
 
 
+static char *GetContentPath()
+{
+    char *pszContentPath = getenv("TWP_CONTENT_PATH");
+    if (pszContentPath == NULL || strchr(pszContentPath, ';') != NULL)
+        return strdup("./");
+
+    return strdup(pszContentPath);
+}
+
+
 /**
  * Test framework helper function: get content files' root path.
  */
 static char *GetTestRoot(void)
 {
-    int iLen, iEnvLen;
-    char *pszRoot = NULL, *pszEnv = getenv("TWP_CONTENT_PATH");
+    int iLen, iContentPathLen;
+    char *pszRoot = NULL, *pszContentPath = GetContentPath();
 
-    if (pszEnv != NULL &&
-        (iEnvLen = strlen(pszEnv)) > 0)
+    if (pszContentPath != NULL &&
+        (iContentPathLen = strlen(pszContentPath)) > 0)
     {
-        iLen = iEnvLen;
+        iLen = iContentPathLen;
         iLen += 64; /* Reserved 64 bytes for PID. */
         iLen += strlen(TWP_TEST_CONTENT_DIR);
         pszRoot = (char *) calloc(iLen + 1, sizeof(char));
         if (pszRoot != NULL)
         {
-            if (pszEnv[iEnvLen - 1] != '/')
-                snprintf(pszRoot, iLen, "%s/%d/%s", pszEnv, (int) getpid(),
+            if (pszContentPath[iContentPathLen - 1] != '/')
+                snprintf(pszRoot, iLen, "%s/%d/%s", pszContentPath, (int) getpid(),
                          TWP_TEST_CONTENT_DIR);
             else
-                snprintf(pszRoot, iLen, "%s%d/%s", pszEnv, (int) getpid(),
+                snprintf(pszRoot, iLen, "%s%d/%s", pszContentPath, (int) getpid(),
                          TWP_TEST_CONTENT_DIR);
         }
     }
@@ -378,6 +390,9 @@ static char *GetTestRoot(void)
             snprintf(pszRoot, iLen, "./%d", (int) getpid());
         }
     }
+
+    if (pszContentPath != NULL)
+        free(pszContentPath);
 
     return pszRoot;
 }
@@ -394,7 +409,7 @@ static void PutTestRoot(char *pszRoot)
 int CreateTestDirs(void)
 {
     int iLen, iRet = -1;
-    char *pszCommand, *pszRoot = GetTestRoot(), *pszEnv, *pszBackup;
+    char *pszCommand, *pszRoot = GetTestRoot(), *pszContentPath, *pszBackup;
 
     if (pszRoot != NULL)
     {
@@ -414,13 +429,18 @@ int CreateTestDirs(void)
                 CallSys(pszCommand);
                 pszCommand[0] = 0;
 
-                pszEnv = getenv("TWP_CONTENT_PATH");
-                if (pszEnv == NULL)
-                    pszEnv = "./";
-                if (pszEnv[strlen(pszEnv) - 1] == '/')
-                    snprintf(pszCommand, iLen, "cp -f %s* %s", pszEnv, pszRoot);
+                pszContentPath = GetContentPath();
+                if (pszContentPath == NULL)
+                {
+                    free(pszCommand);
+                    PutBackupDir(pszBackup);
+                    PutTestRoot(pszRoot);
+                    return iRet;
+                } 
+                if (pszContentPath[strlen(pszContentPath) - 1] == '/')
+                    snprintf(pszCommand, iLen, "cp -f %s* %s", pszContentPath, pszRoot);
                 else
-                    snprintf(pszCommand, iLen, "cp -f %s/* %s", pszEnv, pszRoot);
+                    snprintf(pszCommand, iLen, "cp -f %s/* %s", pszContentPath, pszRoot);
                 CallSys(pszCommand);
 
                 free(pszCommand);
@@ -428,7 +448,7 @@ int CreateTestDirs(void)
                 iRet = 0;
             }
             PutBackupDir(pszBackup);
-        }
+        } 
         PutTestRoot(pszRoot);
     }
 
@@ -438,21 +458,22 @@ int CreateTestDirs(void)
 
 void DestoryTestDirs(void)
 {
-    int iLen, iEnvLen;
-    char *pszCommand, *pszEnv = getenv("TWP_CONTENT_PATH");
+    int iLen, iContentPathLen;
+    char *pszCommand, *pszContentPath = GetContentPath();
 
-    if (pszEnv == NULL || strlen(pszEnv) == 0)
-        pszEnv = "./";
-    iEnvLen = strlen(pszEnv);
-    iLen = iEnvLen;
+    if (pszContentPath == NULL)
+        return;
+
+    iContentPathLen = strlen(pszContentPath);
+    iLen = iContentPathLen;
     iLen += 72; /* Reserved for "rm -rf" and PID */
     pszCommand = (char *) calloc(iLen + 1, sizeof(char));
     if (pszCommand != NULL)
     {
-        if (pszEnv[iEnvLen - 1] == '/')
-            snprintf(pszCommand, iLen, "rm -rf %s%d", pszEnv, (int) getpid());
+        if (pszContentPath[iContentPathLen - 1] == '/')
+            snprintf(pszCommand, iLen, "rm -rf %s%d", pszContentPath, (int) getpid());
         else
-            snprintf(pszCommand, iLen, "rm -rf %s/%d", pszEnv, (int) getpid());
+            snprintf(pszCommand, iLen, "rm -rf %s/%d", pszContentPath, (int) getpid());
         CallSys(pszCommand);
         free(pszCommand);
     }
@@ -461,24 +482,25 @@ void DestoryTestDirs(void)
 
 static char *GetBackupDir(void)
 {
-    int iLen, iEnvLen;
-    char *pszEnv = getenv("TWP_CONTENT_PATH"), *pszPath;
+    int iLen, iContentPathLen;
+    char *pszContentPath = GetContentPath(), *pszPath;
 
-    if (pszEnv == NULL || strlen(pszEnv) == 0)
-        pszEnv = "./";
-    iEnvLen = strlen(pszEnv);
-    iLen = iEnvLen;
+    if (pszContentPath == NULL)
+        return NULL;
+
+    iContentPathLen = strlen(pszContentPath);
+    iLen = iContentPathLen;
     iLen += strlen(TWP_BACKUP_CONTENT_DIR);
     iLen += 64; /* Reserved for slash char and PID. */
     pszPath = (char *) calloc(iLen + 1, sizeof(char));
 
     if (pszPath)
     {
-        if (pszEnv[iEnvLen - 1] == '/')
-            snprintf(pszPath, iLen, "%s%d/%s", pszEnv, (int) getpid(),
+        if (pszContentPath[iContentPathLen - 1] == '/')
+            snprintf(pszPath, iLen, "%s%d/%s", pszContentPath, (int) getpid(),
                      TWP_BACKUP_CONTENT_DIR);
         else
-            snprintf(pszPath, iLen, "%s/%d/%s", pszEnv, (int) getpid(),
+            snprintf(pszPath, iLen, "%s/%d/%s", pszContentPath, (int) getpid(),
                      TWP_BACKUP_CONTENT_DIR);
     }
 
