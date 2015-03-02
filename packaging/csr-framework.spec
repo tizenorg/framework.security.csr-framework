@@ -79,7 +79,4 @@ cp -f LICENSE %{buildroot}/usr/share/license/%{name}
 %defattr(-,root,root,-)
 #/opt/usr/sbin/*
 /opt/usr/local/compatibility-test/*
-#mkdir -p %{buildroot}/opt/usr/compatibility-test
-#mkdir -p %{buildroot}/opt/usr/compatibility-test/db
-#mkdir -p %{buildroot}/opt/usr/compatibility-test/testcontents
 
