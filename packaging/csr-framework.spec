@@ -73,5 +73,4 @@ cp -f LICENSE %{buildroot}/usr/share/license/%{name}
 %files test
 %defattr(-,root,root,-)
 /usr/sbin/*
-/usr/local/compatibility-test/*
 
