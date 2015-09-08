@@ -125,6 +125,7 @@ extern TWP_RESULT CbSetMethod(struct TWPRequest *pRequest, TWPSubmitMethod Metho
 extern long GenerateRandomNumber();
 extern void DestoryTestDirs(void);
 extern int CreateTestDirs(void);
+extern int DetermineWpEngineLib(void);
 
 extern jmp_buf WPJmpBuf;
 

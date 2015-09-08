@@ -52,6 +52,10 @@
 #endif
 
 
+#define TWP_SECLIB_DEFAULT "/opt/usr/apps/EmbkcJFK7q/lib/plugin/libwpengine.so"
+#define TWP_SECLIB_DCM "/opt/usr/apps/docomo6004/lib/plugin/libwpengine.so"
+
+
 static void ReportTestCase(TestCase *pCtx);
 static void CallSys(const char *pszCmd);
 static void PutTestRoot(char *pszRoot);
@@ -60,6 +64,7 @@ static char *GetBackupDir(void);
 static void PutBackupDir(char *pszBackupDir);
 
 
+const char *pszSecWpLibPath = TWP_SECLIB_DEFAULT;
 int TestCasesCount = 0;
 int Success = 0;
 int Failures = 0;
@@ -126,14 +131,22 @@ void BackupEngine()
 
     if (pszRoot != NULL)
     {
-        asprintf(&pszCommand, "mkdir %s/backup", pszRoot);
+        if (asprintf(&pszCommand, "mkdir %s/backup", pszRoot) == -1)
+        {
+            PutTestRoot(pszRoot);
+            return;
+        }
+
         CallSys(pszCommand);
         free(pszCommand);
 
-        asprintf(&pszCommand, "cp -f /opt/usr/share/sec_plugin/libwpengine.so %s/backup", pszRoot);
+        if (asprintf(&pszCommand, "cp -f /opt/usr/share/sec_plugin/libwpengine.so %s/backup", pszRoot) == -1)
+        {
+            PutTestRoot(pszRoot);
+            return;
+        }
         CallSys(pszCommand);
         free(pszCommand);
-
         PutTestRoot(pszRoot);
     }
 }
@@ -145,10 +158,14 @@ void RestoreEngine()
 
     if (pszRoot != NULL)
     {
-        asprintf(&pszCommand, "cp -f %s/backup/libwpengine.so /opt/usr/share/sec_plugin/", pszRoot);
+        if (asprintf(&pszCommand, "ln -s %s /opt/usr/share/sec_plugin/libwpengine.so", pszSecWpLibPath) < 0)
+        {
+            PutTestRoot(pszRoot);
+            return;
+        }
+
         CallSys(pszCommand);
         free(pszCommand);
-
         PutTestRoot(pszRoot);
     }
 }
@@ -161,12 +178,35 @@ void RemoveEngine()
     BackupEngine();
     if (pszRoot != NULL)
     {
-        asprintf(&pszCommand, "rm -f /opt/usr/share/sec_plugin/libwpengine.so");
+        if (asprintf(&pszCommand, "rm -f /opt/usr/share/sec_plugin/libwpengine.so") < 0)
+        {
+            PutTestRoot(pszRoot);
+            return;
+        }
         CallSys(pszCommand);
         free(pszCommand);
+        PutTestRoot(pszRoot);
     }
 }
 
+
+int DetermineWpEngineLib()
+{
+    struct stat statBuf;
+    if (stat(TWP_SECLIB_DEFAULT, &statBuf) == 0 &&
+        S_ISREG(statBuf.st_mode))
+        pszSecWpLibPath = TWP_SECLIB_DEFAULT;
+    else if (stat(TWP_SECLIB_DCM, &statBuf) == 0 &&
+        S_ISREG(statBuf.st_mode))
+        pszSecWpLibPath = TWP_SECLIB_DCM;
+    else
+    {
+        LOG_OUT("WpEngine was not found \n");
+        return -1;
+    }
+    LOG_OUT("WpEngine found = '%s'\n", pszSecWpLibPath);
+    return 0;
+}
 
 long GenerateRandomNumber()
 {

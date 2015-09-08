@@ -262,10 +262,12 @@ static void TestCases(void)
 static void TCSLibraryOpen_0001(void)
 {
     TestCase TestCtx;
-    TCSLIB_HANDLE hLib;
+    TCSLIB_HANDLE hLib = INVALID_TCSLIB_HANDLE;
 
     TESTCASECTOR(&TestCtx, __FUNCTION__, 0, 0, 0, NULL);
-    TEST_ASSERT((hLib = TCSLibraryOpen()) != INVALID_TCSLIB_HANDLE);
+    hLib = TCSLibraryOpen();
+    TEST_ASSERT(hLib != INVALID_TCSLIB_HANDLE);
+
     TESTCASEDTOR(&TestCtx);
     TCSLibraryClose(hLib);
 }
@@ -275,14 +277,17 @@ static void TCSLibraryOpen_0002(void)
 {
     int iErr;
     TestCase TestCtx;
-    TCSLIB_HANDLE hLib;
+    TCSLIB_HANDLE hLib = INVALID_TCSLIB_HANDLE;
 
     TESTCASECTOR(&TestCtx, __FUNCTION__, 0, 0, 0, NULL);
 
     BackupEngine();
-    system("rm -f /opt/usr/share/sec_plugin/libengine.so");
+    iErr = system("rm -f /opt/usr/share/sec_plugin/libengine.so");
+    TEST_ASSERT(iErr == 0)
 
-    TEST_ASSERT((hLib = TCSLibraryOpen()) == INVALID_TCSLIB_HANDLE);
+    hLib = TCSLibraryOpen();
+    TEST_ASSERT(hLib == INVALID_TCSLIB_HANDLE);
+
     iErr = TCSGetLastError(hLib);
     TEST_ASSERT(TCS_ERRMODULE(iErr) == TCS_ERROR_MODULE_GENERIC);
     TEST_ASSERT(TCS_ERRCODE(iErr) == TCS_ERROR_NOT_IMPLEMENTED);
@@ -298,7 +303,8 @@ static void TCSGetLastError_0001(void)
     TestCase TestCtx;
 
     BackupEngine();
-    system("rm -f /opt/usr/share/sec_plugin/libengine.so");
+    iErr = system("rm -f /opt/usr/share/sec_plugin/libengine.so");
+    TEST_ASSERT(iErr == 0)
 
     TESTCASECTOR(&TestCtx, __FUNCTION__, 0, 0, 0, NULL);
     iErr = TCSGetLastError(INVALID_TCSLIB_HANDLE);
@@ -312,12 +318,14 @@ static void TCSGetLastError_0001(void)
 
 static void TCSScanData_0052(void)
 {
+    int iErr;
     TestCase TestCtx;
     TCSScanParam SP = {0};
     TCSScanResult SR= {0};
 
     BackupEngine();
-    system("rm -f /opt/usr/share/sec_plugin/libengine.so");
+    iErr = system("rm -f /opt/usr/share/sec_plugin/libengine.so");
+    TEST_ASSERT(iErr == 0)
 
     SP.iAction = TCS_SA_SCANONLY;
     SP.iDataType = TCS_DTYPE_UNKNOWN;
@@ -355,7 +363,8 @@ static void TCSLibraryClose_0001(void)
     TCSLIB_HANDLE hLib;
 
     TESTCASECTOR(&TestCtx, __FUNCTION__, 0, 0, 0, NULL);
-    TEST_ASSERT((hLib = TCSLibraryOpen()) != INVALID_TCSLIB_HANDLE)
+    hLib = TCSLibraryOpen();
+    TEST_ASSERT(hLib != INVALID_TCSLIB_HANDLE);
     TEST_ASSERT(TCSLibraryClose(hLib) == 0);
     TESTCASEDTOR(&TestCtx);
 }
@@ -1040,6 +1049,7 @@ static void TCSStartup(void)
     Success = 0;
     Failures = 0;
     CreateTestDirs();
+    TEST_ASSERT(DetermineEngineLib() == 0);
 }
 
 
@@ -1053,18 +1063,23 @@ static void TCSCleanup(void)
 
 static void TCSLibraryOpen_0003(void)
 {
+    int iErr;
     TCSLIB_HANDLE hLib = INVALID_TCSLIB_HANDLE;
     TestCase TestCtx;
 
     TESTCASECTOR(&TestCtx, __FUNCTION__, 0, 0, 0, NULL);
     /* pre-condition is stub library */
     BackupEngine();
-    system("rm -f /opt/usr/share/sec_plugin/libengine.so");
+    iErr = system("rm -f /opt/usr/share/sec_plugin/libengine.so");
+    TEST_ASSERT(iErr == 0);
 
-    TEST_ASSERT((hLib = TCSLibraryOpen()) == INVALID_TCSLIB_HANDLE);
+    hLib = TCSLibraryOpen();
+    TEST_ASSERT(hLib == INVALID_TCSLIB_HANDLE);
     RestoreEngine();
 
-    TEST_ASSERT((hLib = TCSLibraryOpen()) != INVALID_TCSLIB_HANDLE);
+    hLib = TCSLibraryOpen();
+    TEST_ASSERT(hLib != INVALID_TCSLIB_HANDLE);
+
     TCSLibraryClose(hLib);
     TESTCASEDTOR(&TestCtx);
 }
@@ -1072,18 +1087,23 @@ static void TCSLibraryOpen_0003(void)
 
 static void TCSLibraryOpen_0004(void)
 {
+    int iErr;
     TCSLIB_HANDLE hLib = INVALID_TCSLIB_HANDLE;
     TestCase TestCtx;
 
     TESTCASECTOR(&TestCtx, __FUNCTION__, 0, 0, 0, NULL);
 
-    TEST_ASSERT((hLib = TCSLibraryOpen()) != INVALID_TCSLIB_HANDLE);
+    hLib = TCSLibraryOpen();
+    TEST_ASSERT(hLib != INVALID_TCSLIB_HANDLE);
 
     BackupEngine();
-    system("rm -f /opt/usr/share/sec_plugin/libengine.so");
+    iErr = system("rm -f /opt/usr/share/sec_plugin/libengine.so");
+    TEST_ASSERT(iErr == 0);
     TCSLibraryClose(hLib);
 
-    TEST_ASSERT((hLib = TCSLibraryOpen()) == INVALID_TCSLIB_HANDLE);
+    hLib = TCSLibraryOpen();
+    TEST_ASSERT(hLib == INVALID_TCSLIB_HANDLE);
+    hLib = INVALID_TCSLIB_HANDLE;
 
     RestoreEngine();
     TESTCASEDTOR(&TestCtx);

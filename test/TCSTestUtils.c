@@ -75,6 +75,9 @@ if (!(condition)) \
 #define CONTENTS_ROOT "contents"
 #define CONTENTS_TMP "tmp"
 
+#define TCS_SECLIB_DEFAULT "/opt/usr/apps/EmbkcJFK7q/lib/plugin/libengine.so"
+#define TCS_SECLIB_DCM "/opt/usr/apps/docomo6004/lib/plugin/libengine.so"
+
 
 /**
  * Scan context
@@ -131,9 +134,7 @@ static int ScanBuffer(TestCase *pCtx);
 static int ScanFile(TestCase *pCtx);
 static char *GetTestRoot(void);
 static void PutTestRoot(char *pszRoot);
-static int BufferCompare(const char *pBuffer1, const char *pBuffer2, int iLen);
-static int FileCompare(const char *pszFile1, const char *pszFile2);
-static int VerifyRepairData(TestCase *pCtx, const char *pRepairedBuffer,
+static int VerifyRepairData(TestCase *pCtx, char *pRepairedBuffer,
                             int iRepairedLen);
 static int VerifyRepairFile(TestCase *pCtx);
 static void PutBenignSamplePath(char *pszPath);
@@ -160,7 +161,7 @@ static void ReleaseTestObject(ConTestContext *pConCtx, int iResult);
 
 static int ConCheckDetected(int iTType, TCSDetected *pFound, int *pFlags);
 static int ConCheckDetectedList(int iTType, TCSScanResult *pSR, int *pFlags);
-static int ConVerifyRepairData(int iTType, int iCompressFlag, const char *pRepairedBuffer,
+static int ConVerifyRepairData(int iTType, int iCompressFlag, char *pRepairedBuffer,
                                int iRepairedLen);
 static int ConVerifyRepairFile(char *pszSamplePath, int iTType, int iCompressFlag);
 
@@ -185,6 +186,8 @@ static int ConInfectedFile(int iType, int iCompressFlag, const char *pszPath);
 static int ConInfected(int iType, int iCompressFlag, char *pData, int iDataLen);
 
 
+
+const char *pszSecLibPath = TCS_SECLIB_DEFAULT;
 int TestCasesCount = 0;
 int Success = 0;
 int Failures = 0;
@@ -201,12 +204,21 @@ static char *LoadFile(char const *pszFileName, int *piSize)
 
     fseek(pFile, 0, SEEK_END);
     *piSize = (long) ftell(pFile);
-    fseek(pFile, 0, SEEK_SET);
-    if ((pData = (char *) malloc(*piSize + 1)) == NULL)
+
+    if (*piSize < 0)
     {
         fclose(pFile);
         return NULL;
     }
+
+    fseek(pFile, 0, SEEK_SET);
+    pData = (char *) malloc(*piSize + 1);
+    if (pData == NULL)
+    {
+        fclose(pFile);
+        return NULL;
+    }
+
     if (fread(pData, 1, (size_t) *piSize, pFile) != *piSize)
     {
         free(pData);
@@ -950,9 +962,14 @@ static int LoadTestContents(void)
 static char *GetSamplePath(TestCase *pCtx)
 {
     const char *pszSampleFileName;
-    char *pszSamplePath = NULL, *pszRoot = GetTestRoot();
+    char *pszSamplePath = NULL, *pszRoot = NULL;
     int iLen, iTType = pCtx->iTestType, iPolarity = pCtx->iPolarity;
     char *pwd = getenv("PWD");
+
+    if (pwd == NULL)
+        return NULL;
+
+    pszRoot = GetTestRoot();
 
     if (pszRoot != NULL)
     {
@@ -1062,37 +1079,6 @@ void TestScanFileEx(const char *pszFunc, int iTType, int iPolarity,
                    iAction, iCompressFlag, NULL);
     TEST_ASSERT(ScanFile(&TestCtx) == 0);
     TESTCASEDTOR(&TestCtx);
-}
-
-
-static int BufferCompare(const char *pBuffer1, const char *pBuffer2, int iLen)
-{
-
-    return memcmp(pBuffer1, pBuffer2, iLen);
-}
-
-
-static int FileCompare(const char *pszFile1, const char *pszFile2)
-{
-    int iLen1 = 0, iLen2 = 0, iRet = -1;
-    char *pBuffer1 = NULL, *pBuffer2 = NULL;
-
-    pBuffer1 = LoadFile(pszFile1, &iLen1);
-    if (pBuffer1 != NULL)
-    {
-        pBuffer2 = LoadFile(pszFile2, &iLen2);
-        if (pBuffer2 != NULL)
-        {
-            if (iLen1 != iLen2)
-                iRet = iLen1 - iLen2;
-
-            iRet = BufferCompare(pBuffer1, pBuffer2, iLen1);
-            PutLoadedFile(pBuffer2);
-        }
-        PutLoadedFile(pBuffer1);
-    }
-
-    return iRet;
 }
 
 
@@ -1214,7 +1200,7 @@ static int Infected(TestCase *pCtx, char *pData, int iDataLen)
 }
 
 
-static int VerifyRepairData(TestCase *pCtx, const char *pRepairedBuffer,
+static int VerifyRepairData(TestCase *pCtx, char *pRepairedBuffer,
                             int iRepairedLen)
 {
 
@@ -1280,7 +1266,7 @@ static void PutBenignSamplePath(char *pszPath)
 }
 
 
-static int ConVerifyRepairData(int iTType, int iCompressFlag, const char *pRepairedBuffer,
+static int ConVerifyRepairData(int iTType, int iCompressFlag, char *pRepairedBuffer,
                                int iRepairedLen)
 {
 
@@ -1983,14 +1969,22 @@ static char *ConGetSamplePath(int iTType, int iPolarity, int iCid)
 {
     int iLen, iDirLen;
     const char *pszSampleFileName;
-    char *pszSamplePath = NULL, *pszDir = ConGetSampleDir(iCid);
+    char *pszSamplePath = NULL, *pszDir = NULL;
     char *pwd = getenv("PWD");
+
+    if (pwd == NULL)
+        return NULL;
+
+    pszDir = ConGetSampleDir(iCid);
 
     if (pszDir != NULL)
     {
         pszSampleFileName = (iPolarity == INFECTED_DATA ?
                              SampleGetInfectedFileName(iTType) :
                              SampleGetBenignFileName(iTType));
+
+        if (pszSampleFileName == NULL)
+            return NULL;
 
         iDirLen = strlen(pszDir);
         iLen = iDirLen;
@@ -2062,20 +2056,43 @@ int IsTestRepair()
 }
 
 
+int DetermineEngineLib()
+{
+    struct stat statBuf;
+    if (stat(TCS_SECLIB_DEFAULT, &statBuf) == 0 &&
+        S_ISREG(statBuf.st_mode))
+        pszSecLibPath = TCS_SECLIB_DEFAULT;
+    else if (stat(TCS_SECLIB_DCM, &statBuf) == 0 &&
+        S_ISREG(statBuf.st_mode))
+        pszSecLibPath = TCS_SECLIB_DCM;
+    else
+        return -1;
+
+    return 0;
+}
+
+
 void BackupEngine()
 {
     char *pszRoot = GetTestRoot(), *pszCommand;
 
     if (pszRoot != NULL)
     {
-        asprintf(&pszCommand, "mkdir %s/backup", pszRoot);
+        if (asprintf(&pszCommand, "mkdir %s/backup", pszRoot) < 0)
+        {
+            PutTestRoot(pszRoot);
+            return;
+        }
         CallSys(pszCommand);
         free(pszCommand);
 
-        asprintf(&pszCommand, "cp -f /opt/usr/share/sec_plugin/libengine.so %s/backup", pszRoot);
+        if (asprintf(&pszCommand, "cp -f /opt/usr/share/sec_plugin/libengine.so %s/backup", pszRoot) < 0)
+        {
+            PutTestRoot(pszRoot);
+            return;
+        }
         CallSys(pszCommand);
         free(pszCommand);
-
         PutTestRoot(pszRoot);
     }
 }
@@ -2087,7 +2104,11 @@ void RestoreEngine()
 
     if (pszRoot != NULL)
     {
-        asprintf(&pszCommand, "cp -f %s/backup/libengine.so /opt/usr/share/sec_plugin/", pszRoot);
+        if (asprintf(&pszCommand, "ln -s %s /opt/usr/share/sec_plugin/libengine.so", pszSecLibPath) < 0)
+        {
+            PutTestRoot(pszRoot);
+            return;
+        }
         CallSys(pszCommand);
         free(pszCommand);
 

@@ -156,10 +156,11 @@ extern int DetectRepairFunc(void);
 extern int CreateTestDirs(void);
 extern void DestoryTestDirs(void);
 extern int DetectStubLibrary(void);
-extern int IsStubTest();
-extern int IsTestRepair();
-extern void RestoreEngine();
-extern void BackupEngine();
+extern int IsStubTest(void);
+extern int IsTestRepair(void);
+extern void RestoreEngine(void);
+extern void BackupEngine(void);
+extern int DetermineEngineLib(void);
 
 extern jmp_buf JmpBuf;
 

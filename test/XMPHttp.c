@@ -245,7 +245,7 @@ static SOCKET XmPHttpSocket(XmPHttpCtx *pCtx)
 
 int XmPHttpInit(XmPHttpCtx *pCtx)
 {
-    pCtx->iPHttpDebug = 0;
+    pCtx->iPHttpDebug = 1;
     pCtx->iPHttpConnTimeo = XmPHttpGetIntEnv(pCtx, XM_SKCONN_TIMEO, SOCK_STD_CONTIMEO);
 
     PHTTP_DBGPRINT(pCtx, ("[phttp] Library initialization succeeded\n"));
@@ -443,7 +443,7 @@ static struct SStream *XmPHttpConnect(XmPHttpCtx *pCtx, char const *pszServer, i
     {
         if ((pHE = gethostbyname(pszServer)) == NULL)
         {
-            PHTTP_DBGPRINT(pCtx, ("[phttp] Server name resolve error: server='%s'\n", pszServer));
+            PHTTP_DBGPRINT(pCtx, ("[phttp] Server name resolve error: server='%s' error = %d\n", pszServer, errno));
             return NULL;
         }
 

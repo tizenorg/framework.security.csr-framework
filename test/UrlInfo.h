@@ -67,6 +67,14 @@ TWPCategories VIOLATIONS_0_0_2[2] =
     TWP_OverallRiskHigh
 };
 
+
+TWPCategories CATEGORIES_0_0_3[3] =
+{
+    TWP_Malicioussites,
+    TWP_Maliciousdownloads,
+    TWP_OverallRiskHigh
+};
+
 #define SCORE_0_0 127
 #define CATEGORY_0_0_0 TWP_Pharmacy
 #define CATEGORY_0_0_1 TWP_OverallRiskHigh

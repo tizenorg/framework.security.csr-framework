@@ -166,7 +166,8 @@ static void TWPInitLibrary_0001(void)
     TWPLIB_HANDLE hLib = INVALID_TWPLIB_HANDLE;
 
     TESTCASECTOR(&TestCtx, __FUNCTION__);
-    TEST_ASSERT((hLib = TWPInitLibrary(&Init)) != INVALID_TWPLIB_HANDLE);
+    hLib = TWPInitLibrary(&Init);
+    TEST_ASSERT(hLib != INVALID_TWPLIB_HANDLE);
     TESTCASEDTOR(&TestCtx);
     TWPUninitLibrary(hLib);
 }
@@ -175,13 +176,15 @@ static void TWPInitLibrary_0001(void)
 static void TWPInitLibrary_0002(void)
 {
     TestCase TestCtx;
-    TWPLIB_HANDLE hLib;
+    TWPLIB_HANDLE hLib = INVALID_TWPLIB_HANDLE;
 
     TESTCASECTOR(&TestCtx, __FUNCTION__);
 
     RemoveEngine();
 
-    TEST_ASSERT((hLib = TWPInitLibrary(&Init)) == INVALID_TWPLIB_HANDLE);
+    hLib = TWPInitLibrary(&Init);
+    TEST_ASSERT(hLib == INVALID_TWPLIB_HANDLE);
+
     TESTCASEDTOR(&TestCtx);
 
     RestoreEngine();
@@ -191,17 +194,20 @@ static void TWPInitLibrary_0002(void)
 static void TWPInitLibrary_0003(void)
 {
     TestCase TestCtx;
-    TWPLIB_HANDLE hLib;
+    TWPLIB_HANDLE hLib = INVALID_TWPLIB_HANDLE;
 
     RemoveEngine();
 
     TESTCASECTOR(&TestCtx, __FUNCTION__);
 
-    TEST_ASSERT((hLib = TWPInitLibrary(&Init)) == INVALID_TWPLIB_HANDLE);
-    RestoreEngine();
-    TEST_ASSERT((hLib = TWPInitLibrary(&Init)) != INVALID_TWPLIB_HANDLE);
-    TWPUninitLibrary(hLib);
+    hLib = TWPInitLibrary(&Init);
+    TEST_ASSERT(hLib == INVALID_TWPLIB_HANDLE);
 
+    RestoreEngine();
+    hLib = TWPInitLibrary(&Init);
+    TEST_ASSERT(hLib != INVALID_TWPLIB_HANDLE);
+
+    TWPUninitLibrary(hLib);
     TESTCASEDTOR(&TestCtx);
 }
 
@@ -209,14 +215,17 @@ static void TWPInitLibrary_0003(void)
 static void TWPInitLibrary_0004(void)
 {
     TestCase TestCtx;
-    TWPLIB_HANDLE hLib;
+    TWPLIB_HANDLE hLib = INVALID_TWPLIB_HANDLE;
 
     TESTCASECTOR(&TestCtx, __FUNCTION__);
+    hLib = TWPInitLibrary(&Init);
+    TEST_ASSERT(hLib != INVALID_TWPLIB_HANDLE);
 
-    TEST_ASSERT((hLib = TWPInitLibrary(&Init)) != INVALID_TWPLIB_HANDLE);
     TWPUninitLibrary(hLib);
     RemoveEngine();
-    TEST_ASSERT((hLib = TWPInitLibrary(&Init)) == INVALID_TWPLIB_HANDLE);
+    hLib = TWPInitLibrary(&Init);
+    TEST_ASSERT(hLib == INVALID_TWPLIB_HANDLE);
+
     TESTCASEDTOR(&TestCtx);
     RestoreEngine();
 }
@@ -229,7 +238,8 @@ static void TWPConfigurationCreate_0001(void)
     TWPConfigurationHandle hCfg;
 
     TESTCASECTOR(&TestCtx, __FUNCTION__);
-    TEST_ASSERT((hLib = TWPInitLibrary(&Init)) != INVALID_TWPLIB_HANDLE);
+    hLib = TWPInitLibrary(&Init);
+    TEST_ASSERT(hLib != INVALID_TWPLIB_HANDLE);
     TEST_ASSERT(TWPConfigurationCreate(hLib, &Cfg, &hCfg) == TWP_SUCCESS);
     TEST_ASSERT(hCfg != NULL);
     TEST_ASSERT(TWPConfigurationDestroy(hLib, &hCfg) == TWP_SUCCESS);
@@ -245,7 +255,9 @@ static void TWPConfigurationCreate_0002(void)
     TWPConfigurationHandle hCfg;
 
     TESTCASECTOR(&TestCtx, __FUNCTION__);
-    TEST_ASSERT((hLib = TWPInitLibrary(&Init)) != INVALID_TWPLIB_HANDLE);
+    hLib = TWPInitLibrary(&Init);
+    TEST_ASSERT(hLib != INVALID_TWPLIB_HANDLE);
+
     TEST_ASSERT(TWPConfigurationCreate(hLib, NULL, &hCfg) != TWP_SUCCESS);
     TWPUninitLibrary(hLib);
     TESTCASEDTOR(&TestCtx);
@@ -275,7 +287,9 @@ static void TWPPolicyCreate_0001(void)
     };
 
     TESTCASECTOR(&TestCtx, __FUNCTION__);
-    TEST_ASSERT((hLib = TWPInitLibrary(&Init)) != INVALID_TWPLIB_HANDLE);
+    hLib = TWPInitLibrary(&Init);
+    TEST_ASSERT(hLib != INVALID_TWPLIB_HANDLE);
+
     TEST_ASSERT(TWPConfigurationCreate(hLib, &Cfg, &hCfg) == TWP_SUCCESS);
     TEST_ASSERT(TWPPolicyCreate(hLib, hCfg, Categories, ELEMENT_NUM(Categories), &hPolicy) == TWP_SUCCESS);
     TEST_ASSERT(hPolicy != NULL);
@@ -294,7 +308,8 @@ static void TWPPolicyCreate_0002(void)
     TWPConfigurationHandle hCfg;
 
     TESTCASECTOR(&TestCtx, __FUNCTION__);
-    TEST_ASSERT((hLib = TWPInitLibrary(&Init)) != INVALID_TWPLIB_HANDLE);
+    hLib = TWPInitLibrary(&Init);
+    TEST_ASSERT(hLib != INVALID_TWPLIB_HANDLE);
     TEST_ASSERT(TWPConfigurationCreate(hLib, &Cfg, &hCfg) == TWP_SUCCESS);
     TEST_ASSERT(TWPPolicyCreate(hLib, hCfg, NULL, 0, &hPolicy) != TWP_SUCCESS);
     TEST_ASSERT(TWPConfigurationDestroy(hLib, &hCfg) == TWP_SUCCESS);
@@ -326,7 +341,9 @@ static void TWPLookupUrls_0001(void)
     };
 
     TESTCASECTOR(&TestCtx, __FUNCTION__);
-    TEST_ASSERT((hLib = TWPInitLibrary(&Init)) != INVALID_TWPLIB_HANDLE);
+    hLib = TWPInitLibrary(&Init);
+    TEST_ASSERT(hLib != INVALID_TWPLIB_HANDLE);
+
     TEST_ASSERT(TWPConfigurationCreate(hLib, &Cfg, &hCfg) == TWP_SUCCESS);
     TEST_ASSERT(hCfg != NULL);
     TEST_ASSERT(TWPLookupUrls(hLib, hCfg, (TWPRequest *) &Request, 0, ppUrls,
@@ -347,7 +364,9 @@ static void TWPLookupUrls_0002(void)
     TWPResponseHandle hResponse;
 
     TESTCASECTOR(&TestCtx, __FUNCTION__);
-    TEST_ASSERT((hLib = TWPInitLibrary(&Init)) != INVALID_TWPLIB_HANDLE);
+    hLib = TWPInitLibrary(&Init);
+    TEST_ASSERT(hLib != INVALID_TWPLIB_HANDLE);
+
     TEST_ASSERT(TWPConfigurationCreate(hLib, &Cfg, &hCfg) == TWP_SUCCESS);
     TEST_ASSERT(hCfg != NULL);
     TEST_ASSERT(TWPLookupUrls(hLib, hCfg, (TWPRequest *) &Request, 0,
@@ -371,7 +390,8 @@ static void TWPLookupUrls_0003(void)
     };
 
     TESTCASECTOR(&TestCtx, __FUNCTION__);
-    TEST_ASSERT((hLib = TWPInitLibrary(&Init)) != INVALID_TWPLIB_HANDLE);
+    hLib = TWPInitLibrary(&Init);
+    TEST_ASSERT(hLib != INVALID_TWPLIB_HANDLE);
     TEST_ASSERT(TWPConfigurationCreate(hLib, &Cfg, &hCfg) == TWP_SUCCESS);
     TEST_ASSERT(hCfg != NULL);
     ARequest.Request.receivefunc = NULL;
@@ -399,7 +419,8 @@ static void TWPLookupUrls_0004(void)
     };
 
     TESTCASECTOR(&TestCtx, __FUNCTION__);
-    TEST_ASSERT((hLib = TWPInitLibrary(&Init)) != INVALID_TWPLIB_HANDLE);
+    hLib = TWPInitLibrary(&Init);
+    TEST_ASSERT(hLib != INVALID_TWPLIB_HANDLE);
     TEST_ASSERT(TWPConfigurationCreate(hLib, &Cfg, &hCfg) == TWP_SUCCESS);
     TEST_ASSERT(hCfg != NULL);
     TEST_ASSERT(TWPLookupUrls(hLib, hCfg, (TWPRequest *) &Request, 0, ppUrls,
@@ -444,7 +465,8 @@ static void TWPGetUrlRating_0001(void)
     };
 
     TESTCASECTOR(&TestCtx, __FUNCTION__);
-    TEST_ASSERT((hLib = TWPInitLibrary(&Init)) != INVALID_TWPLIB_HANDLE);
+    hLib = TWPInitLibrary(&Init);
+    TEST_ASSERT(hLib != INVALID_TWPLIB_HANDLE);
     TEST_ASSERT(TWPConfigurationCreate(hLib, &Cfg, &hCfg) == TWP_SUCCESS);
     TEST_ASSERT(hCfg != NULL);
     TEST_ASSERT(TWPLookupUrls(hLib, hCfg, (TWPRequest *) &Request, 0,
@@ -471,7 +493,8 @@ static void TWPGetUrlRating_0002(void)
     };
 
     TESTCASECTOR(&TestCtx, __FUNCTION__);
-    TEST_ASSERT((hLib = TWPInitLibrary(&Init)) != INVALID_TWPLIB_HANDLE);
+    hLib = TWPInitLibrary(&Init);
+    TEST_ASSERT(hLib != INVALID_TWPLIB_HANDLE);
     TEST_ASSERT(TWPConfigurationCreate(hLib, &Cfg, &hCfg) == TWP_SUCCESS);
     TEST_ASSERT(hCfg != NULL);
     TEST_ASSERT(TWPLookupUrls(hLib, hCfg, (TWPRequest *) &Request, 0,
@@ -499,7 +522,8 @@ static void TWPGetUrlRating_0003(void)
     };
 
     TESTCASECTOR(&TestCtx, __FUNCTION__);
-    TEST_ASSERT((hLib = TWPInitLibrary(&Init)) != INVALID_TWPLIB_HANDLE);
+    hLib = TWPInitLibrary(&Init);
+    TEST_ASSERT(hLib != INVALID_TWPLIB_HANDLE);
     TEST_ASSERT(TWPConfigurationCreate(hLib, &Cfg, &hCfg) == TWP_SUCCESS);
     TEST_ASSERT(hCfg != NULL);
     TEST_ASSERT(TWPLookupUrls(hLib, hCfg, (TWPRequest *) &Request, 0,
@@ -526,7 +550,8 @@ static void TWPGetUrlRating_0004(void)
     };
 
     TESTCASECTOR(&TestCtx, __FUNCTION__);
-    TEST_ASSERT((hLib = TWPInitLibrary(&Init)) != INVALID_TWPLIB_HANDLE);
+    hLib = TWPInitLibrary(&Init);
+    TEST_ASSERT(hLib != INVALID_TWPLIB_HANDLE);
     TEST_ASSERT(TWPConfigurationCreate(hLib, &Cfg, &hCfg) == TWP_SUCCESS);
     TEST_ASSERT(hCfg != NULL);
     TEST_ASSERT(TWPLookupUrls(hLib, hCfg, (TWPRequest *) &Request, 0,
@@ -585,7 +610,8 @@ static void TWPGetUrlRatingsCount_0001(void)
     unsigned int uCount = 0;
 
     TESTCASECTOR(&TestCtx, __FUNCTION__);
-    TEST_ASSERT((hLib = TWPInitLibrary(&Init)) != INVALID_TWPLIB_HANDLE);
+    hLib = TWPInitLibrary(&Init);
+    TEST_ASSERT(hLib != INVALID_TWPLIB_HANDLE);
     TEST_ASSERT(TWPConfigurationCreate(hLib, &Cfg, &hCfg) == TWP_SUCCESS);
     TEST_ASSERT(hCfg != NULL);
     TEST_ASSERT(TWPLookupUrls(hLib, hCfg, (TWPRequest *) &Request, 0,
@@ -632,7 +658,8 @@ static void TWPGetRedirUrlFor_0001(void)
     TWPPolicyHandle hPolicy;
 
     TESTCASECTOR(&TestCtx, __FUNCTION__);
-    TEST_ASSERT((hLib = TWPInitLibrary(&Init)) != INVALID_TWPLIB_HANDLE);
+    hLib = TWPInitLibrary(&Init);
+    TEST_ASSERT(hLib != INVALID_TWPLIB_HANDLE);
     TEST_ASSERT(TWPConfigurationCreate(hLib, &Cfg, &hCfg) == TWP_SUCCESS);
     TEST_ASSERT(hCfg != NULL);
     TEST_ASSERT(TWPLookupUrls(hLib, hCfg, (TWPRequest *) &Request, 1,
@@ -685,7 +712,8 @@ static void TWPPolicyValidate_0001(void)
     int iViolated = 0;
 
     TESTCASECTOR(&TestCtx, __FUNCTION__);
-    TEST_ASSERT((hLib = TWPInitLibrary(&Init)) != INVALID_TWPLIB_HANDLE);
+    hLib = TWPInitLibrary(&Init);
+    TEST_ASSERT(hLib != INVALID_TWPLIB_HANDLE);
     TEST_ASSERT(TWPConfigurationCreate(hLib, &Cfg, &hCfg) == TWP_SUCCESS);
     TEST_ASSERT(hCfg != NULL);
     TEST_ASSERT(TWPLookupUrls(hLib, hCfg, (TWPRequest *) &Request, 0,
@@ -718,7 +746,8 @@ static void TWPPolicyValidate_0002(void)
     int iViolated = 0;
 
     TESTCASECTOR(&TestCtx, __FUNCTION__);
-    TEST_ASSERT((hLib = TWPInitLibrary(&Init)) != INVALID_TWPLIB_HANDLE);
+    hLib = TWPInitLibrary(&Init);
+    TEST_ASSERT(hLib != INVALID_TWPLIB_HANDLE);
     TEST_ASSERT(TWPConfigurationCreate(hLib, &Cfg, &hCfg) == TWP_SUCCESS);
     TEST_ASSERT(hCfg != NULL);
     TEST_ASSERT(TWPLookupUrls(hLib, hCfg, (TWPRequest *) &Request, 0,
@@ -767,7 +796,8 @@ static void TWPPolicyGetViolations_0001(void)
     int i;
 
     TESTCASECTOR(&TestCtx, __FUNCTION__);
-    TEST_ASSERT((hLib = TWPInitLibrary(&Init)) != INVALID_TWPLIB_HANDLE);
+    hLib = TWPInitLibrary(&Init);
+    TEST_ASSERT(hLib != INVALID_TWPLIB_HANDLE);
     TEST_ASSERT(TWPConfigurationCreate(hLib, &Cfg, &hCfg) == TWP_SUCCESS);
     TEST_ASSERT(hCfg != NULL);
     TEST_ASSERT(TWPLookupUrls(hLib, hCfg, (TWPRequest *) &Request, 0,
@@ -806,7 +836,8 @@ static void TWPPolicyGetViolations_0002(void)
     unsigned int uLength = 0;
 
     TESTCASECTOR(&TestCtx, __FUNCTION__);
-    TEST_ASSERT((hLib = TWPInitLibrary(&Init)) != INVALID_TWPLIB_HANDLE);
+    hLib = TWPInitLibrary(&Init);
+    TEST_ASSERT(hLib != INVALID_TWPLIB_HANDLE);
     TEST_ASSERT(TWPConfigurationCreate(hLib, &Cfg, &hCfg) == TWP_SUCCESS);
     TEST_ASSERT(hCfg != NULL);
     TEST_ASSERT(TWPLookupUrls(hLib, hCfg, (TWPRequest *) &Request, 0,
@@ -854,7 +885,8 @@ static void TWPRatingGetScore_0001(void)
     int iScore;
 
     TESTCASECTOR(&TestCtx, __FUNCTION__);
-    TEST_ASSERT((hLib = TWPInitLibrary(&Init)) != INVALID_TWPLIB_HANDLE);
+    hLib = TWPInitLibrary(&Init);
+    TEST_ASSERT(hLib != INVALID_TWPLIB_HANDLE);
     TEST_ASSERT(TWPConfigurationCreate(hLib, &Cfg, &hCfg) == TWP_SUCCESS);
     TEST_ASSERT(hCfg != NULL);
     TEST_ASSERT(TWPLookupUrls(hLib, hCfg, (TWPRequest *) &Request, 0,
@@ -898,7 +930,8 @@ static void TWPRatingGetUrl_0001(void)
     unsigned int uLength = 0;
 
     TESTCASECTOR(&TestCtx, __FUNCTION__);
-    TEST_ASSERT((hLib = TWPInitLibrary(&Init)) != INVALID_TWPLIB_HANDLE);
+    hLib = TWPInitLibrary(&Init);
+    TEST_ASSERT(hLib != INVALID_TWPLIB_HANDLE);
     TEST_ASSERT(TWPConfigurationCreate(hLib, &Cfg, &hCfg) == TWP_SUCCESS);
     TEST_ASSERT(hCfg != NULL);
     TEST_ASSERT(TWPLookupUrls(hLib, hCfg, (TWPRequest *) &Request, 0,
@@ -944,7 +977,8 @@ static void TWPRatingGetDLAUrl_0001(void)
     unsigned int uLength = 0;
 
     TESTCASECTOR(&TestCtx, __FUNCTION__);
-    TEST_ASSERT((hLib = TWPInitLibrary(&Init)) != INVALID_TWPLIB_HANDLE);
+    hLib = TWPInitLibrary(&Init);
+    TEST_ASSERT(hLib != INVALID_TWPLIB_HANDLE);
     TEST_ASSERT(TWPConfigurationCreate(hLib, &Cfg, &hCfg) == TWP_SUCCESS);
     TEST_ASSERT(hCfg != NULL);
     TEST_ASSERT(TWPLookupUrls(hLib, hCfg, (TWPRequest *) &Request, 0,
@@ -988,7 +1022,8 @@ static void TWPRatingHasCategory_0001(void)
     int iPresent = 0;
 
     TESTCASECTOR(&TestCtx, __FUNCTION__);
-    TEST_ASSERT((hLib = TWPInitLibrary(&Init)) != INVALID_TWPLIB_HANDLE);
+    hLib = TWPInitLibrary(&Init);
+    TEST_ASSERT(hLib != INVALID_TWPLIB_HANDLE);
     TEST_ASSERT(TWPConfigurationCreate(hLib, &Cfg, &hCfg) == TWP_SUCCESS);
     TEST_ASSERT(hCfg != NULL);
     TEST_ASSERT(TWPLookupUrls(hLib, hCfg, (TWPRequest *) &Request, 0,
@@ -1018,7 +1053,8 @@ static void TWPRatingHasCategory_0002(void)
     int iPresent = 0;
 
     TESTCASECTOR(&TestCtx, __FUNCTION__);
-    TEST_ASSERT((hLib = TWPInitLibrary(&Init)) != INVALID_TWPLIB_HANDLE);
+    hLib = TWPInitLibrary(&Init);
+    TEST_ASSERT(hLib != INVALID_TWPLIB_HANDLE);
     TEST_ASSERT(TWPConfigurationCreate(hLib, &Cfg, &hCfg) == TWP_SUCCESS);
     TEST_ASSERT(hCfg != NULL);
     TEST_ASSERT(TWPLookupUrls(hLib, hCfg, (TWPRequest *) &Request, 0,
@@ -1063,7 +1099,8 @@ static void TWPRatingGetCategories_0001(void)
     int i;
 
     TESTCASECTOR(&TestCtx, __FUNCTION__);
-    TEST_ASSERT((hLib = TWPInitLibrary(&Init)) != INVALID_TWPLIB_HANDLE);
+    hLib = TWPInitLibrary(&Init);
+    TEST_ASSERT(hLib != INVALID_TWPLIB_HANDLE);
     TEST_ASSERT(TWPConfigurationCreate(hLib, &Cfg, &hCfg) == TWP_SUCCESS);
     TEST_ASSERT(hCfg != NULL);
     TEST_ASSERT(TWPLookupUrls(hLib, hCfg, (TWPRequest *) &Request, 0,
@@ -1071,10 +1108,10 @@ static void TWPRatingGetCategories_0001(void)
     TEST_ASSERT(hResponse != NULL);
     TEST_ASSERT(TWPResponseGetUrlRatingByUrl(hLib, hResponse, ppUrls[0], strlen(ppUrls[0]), &hRating) == TWP_SUCCESS);
     TEST_ASSERT(TWPUrlRatingGetCategories(hLib, hRating, &pCategories, &uLength) == TWP_SUCCESS);
-    TEST_ASSERT(uLength == ELEMENT_NUM(CATEGORIES_0_0_1));
+    TEST_ASSERT(uLength == ELEMENT_NUM(CATEGORIES_0_0_3));
     for (i = 0; i < uLength; i++)
     {
-        TEST_ASSERT(pCategories[i] == CATEGORIES_0_0_1[i]);
+        TEST_ASSERT(pCategories[i] == CATEGORIES_0_0_3[i]);
     }
     free(pCategories);
     TEST_ASSERT(TWPResponseDestroy(hLib, &hResponse) == TWP_SUCCESS);
@@ -1099,7 +1136,8 @@ static void TWPRatingGetCategories_0002(void)
     unsigned int uLength = 0;
 
     TESTCASECTOR(&TestCtx, __FUNCTION__);
-    TEST_ASSERT((hLib = TWPInitLibrary(&Init)) != INVALID_TWPLIB_HANDLE);
+    hLib = TWPInitLibrary(&Init);
+    TEST_ASSERT(hLib != INVALID_TWPLIB_HANDLE);
     TEST_ASSERT(TWPConfigurationCreate(hLib, &Cfg, &hCfg) == TWP_SUCCESS);
     TEST_ASSERT(hCfg != NULL);
     TEST_ASSERT(TWPLookupUrls(hLib, hCfg, (TWPRequest *) &Request, 0,
@@ -1135,6 +1173,7 @@ static void TWPStartup(void)
     extern int Success;
     extern int Failures;
 
+    TEST_ASSERT(DetermineWpEngineLib() == 0);
     TestCasesCount = 0;
     Success = 0;
     Failures = 0;
@@ -1146,10 +1185,14 @@ static void TWPStartup(void)
     srandom(time(NULL));
 
     Cfg.config_version = TWPCONFIG_VERSION;
-    Cfg.client_id = "SamsungTizen";
-	Cfg.client_key = "{3353DFB5-6978-43E7-AFBE-E3B251B4C303}";
+    Cfg.client_id = NULL;
+    Cfg.client_key = NULL;
     Cfg.host = NULL;
+#if !defined(TWP_USESSL)
     Cfg.secure_connection = 0;
+#else
+    Cfg.secure_connection = 1;
+#endif
     Cfg.skip_dla = 0;
     Cfg.obfuscate_request = 1;
     Cfg.randomfunc = GenerateRandomNumber;
@@ -1159,7 +1202,6 @@ static void TWPStartup(void)
     Request.Request.setmethodfunc = CbSetMethod;
     Request.Request.sendfunc = CbSend;
     Request.Request.receivefunc = CbRecv;
-
     CreateTestDirs();
 }
 
@@ -1168,7 +1210,7 @@ static void TWPCleanup(void)
 {
     LOG_OUT("@@@@@@@@@@@@@@@@@@@@@@@@\n");
     LOG_OUT("Test done: %d executed, %d passed, %d failure\n", TestCasesCount, Success, Failures);
-    
+
     if (Request.hHttp != INVALID_XM_HTTP_HANDLE)
         XmHttpClose(Request.hHttp);
 
