@@ -31,7 +31,6 @@
 #ifndef __TIZEN_CSR_FRAME_WORK_TWP_DOC_H__
 #define __TIZEN_CSR_FRAME_WORK_TWP_DOC_H__
 /**
- * @internal
  * @ingroup CAPI_CSRFW
  * @defgroup CAPI_CSRFW_TWP_MODULE TWP
  * @brief Content Screening API definitions, structures and macros

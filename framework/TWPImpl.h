@@ -38,7 +38,6 @@ extern "C" {
 #endif
 
 /**
- * @internal
  * @addtogroup CAPI_CSRFW_TWP_MODULE
  * @{
  */

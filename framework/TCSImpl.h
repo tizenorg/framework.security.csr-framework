@@ -37,7 +37,6 @@ extern "C" {
 #endif
 
 /**
- * @internal
  * @addtogroup CAPI_CSRFW_TCS_MODULE
  * @{
  */

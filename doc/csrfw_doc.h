@@ -18,7 +18,6 @@
 #define __TIZEN_CORE_CSRFW_DOC_H__
 
 /**
- *@internal
  *@defgroup CAPI_CSRFW CSR Framework
  *@brief These APIs provide checking content screening and blocking access of malicious web site.
  *@ingroup CAPI_SECURITY_FRAMEWORK

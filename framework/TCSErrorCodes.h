@@ -44,7 +44,6 @@ extern "C" {
  */
 
 /**
- * @internal
  * @addtogroup CAPI_CSRFW_TCS_MODULE
  * @{
  */
